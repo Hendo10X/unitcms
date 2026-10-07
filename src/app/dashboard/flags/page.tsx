@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { PageHeader, Panel } from "@/components/dashboard/page-header"
+import { useConfirm } from "@/components/dashboard/confirm"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
@@ -13,6 +14,7 @@ import type { Flag } from "@/lib/types"
 
 export default function FlagsPage() {
   const { admin, env } = useStore()
+  const confirm = useConfirm()
   const { data, loading, error, reload } = useResource<{ data: Flag[] }>("/flags")
   const [key, setKey] = useState("")
   const [desc, setDesc] = useState("")
@@ -54,6 +56,13 @@ export default function FlagsPage() {
               variant="ghost"
               aria-label="Delete"
               onClick={async () => {
+                const ok = await confirm({
+                  title: `Delete ${f.key}?`,
+                  description: "Apps that check this flag will see it as off.",
+                  confirmLabel: "Delete",
+                  destructive: true,
+                })
+                if (!ok) return
                 try { await admin(`/flags/${f.key}`, { method: "DELETE" }); reload() } catch (e) { toast.error(errorMessage(e)) }
               }}
             >

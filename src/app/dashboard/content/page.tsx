@@ -7,6 +7,8 @@ import { Ago } from "@/components/dashboard/ago"
 import { PageHeader, Panel } from "@/components/dashboard/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
+import { useConfirm } from "@/components/dashboard/confirm"
 import { errorMessage } from "@/lib/api"
 import { useResource, useStore } from "@/lib/store"
 import { titleOf, type ContentType, type Entry, type MediaItem } from "@/lib/types"
@@ -16,7 +18,9 @@ import { TypesPanel } from "./types-panel"
 
 export default function ContentPage() {
   const { admin } = useStore()
-  const types = useResource<{ data: ContentType[] }>("/types")
+  const confirm = useConfirm()
+  const [busyId, setBusyId] = useState<string | null>(null)
+  const types =useResource<{ data: ContentType[] }>("/types")
   const entries = useResource<{ data: Entry[] }>("/entries?limit=100")
   const media = useResource<{ data: MediaItem[] }>("/media")
 
@@ -34,6 +38,19 @@ export default function ContentPage() {
     const f = all.filter((e) => (type === "all" || e.type === type) && (!needle || JSON.stringify(e.attributes).toLowerCase().includes(needle)))
     return [...f].sort((a, b) => (sort === "title" ? titleOf(a).localeCompare(titleOf(b)) : +new Date(b.meta.updatedAt) - +new Date(a.meta.updatedAt)))
   }, [all, q, type, sort])
+
+  async function toggle(entry: Entry, publish: boolean) {
+    setBusyId(entry.id)
+    try {
+      await admin(`/entries/${entry.id}/${publish ? "publish" : "unpublish"}`, { method: "POST" })
+      toast(publish ? "Published" : "Moved back to draft")
+      entries.reload()
+    } catch (e) {
+      toast.error(errorMessage(e))
+    } finally {
+      setBusyId(null)
+    }
+  }
 
   async function act(label: string, fn: () => Promise<unknown>) {
     try {
@@ -112,26 +129,31 @@ export default function ContentPage() {
                     {e.type} · {e.id} · <Ago iso={e.meta.updatedAt} />
                   </p>
                 </button>
-                <span className={cn("rounded-full px-2.5 py-1 text-[11px]", e.meta.status === "published" ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground")}>
-                  {e.meta.status}
-                </span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="bg-secondary"
-                  onClick={() =>
-                    act(e.meta.status === "published" ? "Unpublished" : "Published", () =>
-                      admin(`/entries/${e.id}/${e.meta.status === "published" ? "unpublish" : "publish"}`, { method: "POST" }),
-                    )
-                  }
-                >
-                  {e.meta.status === "published" ? "Unpublish" : "Publish"}
-                </Button>
+                {/* One switch: on means live in the app, off means draft. */}
+                <label className="flex w-[120px] shrink-0 cursor-pointer items-center justify-end gap-2.5 text-[13px]">
+                  <span className={cn("transition-colors", e.meta.status === "published" ? "font-medium text-primary" : "text-muted-foreground")}>
+                    {e.meta.status === "published" ? "Published" : "Draft"}
+                  </span>
+                  <Switch
+                    checked={e.meta.status === "published"}
+                    disabled={busyId === e.id}
+                    aria-label={`${e.meta.status === "published" ? "Unpublish" : "Publish"} ${titleOf(e)}`}
+                    onCheckedChange={(on) => toggle(e, on)}
+                  />
+                </label>
                 <Button
                   size="icon-sm"
                   variant="ghost"
-                  aria-label="Delete"
-                  onClick={() => window.confirm(`Delete "${titleOf(e)}"?`) && act("Entry deleted", () => admin(`/entries/${e.id}`, { method: "DELETE" }))}
+                  aria-label={`Delete ${titleOf(e)}`}
+                  onClick={async () => {
+                    const ok = await confirm({
+                      title: `Delete “${titleOf(e)}”?`,
+                      description: "This entry will be removed for good. Apps that read it will stop seeing it.",
+                      confirmLabel: "Delete",
+                      destructive: true,
+                    })
+                    if (ok) act("Entry deleted", () => admin(`/entries/${e.id}`, { method: "DELETE" }))
+                  }}
                 >
                   <Trash2 />
                 </Button>

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { PageHeader, Panel } from "@/components/dashboard/page-header"
+import { useConfirm } from "@/components/dashboard/confirm"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
@@ -31,6 +32,7 @@ function parse(type: ConfigType, text: string): unknown {
 
 function Row({ item, onChanged }: { item: ConfigItem; onChanged: () => void }) {
   const { admin } = useStore()
+  const confirm = useConfirm()
   const [text, setText] = useState(show(item.value))
   const dirty = text !== show(item.value)
 
@@ -73,6 +75,13 @@ function Row({ item, onChanged }: { item: ConfigItem; onChanged: () => void }) {
         variant="ghost"
         aria-label="Delete"
         onClick={async () => {
+          const ok = await confirm({
+            title: `Delete ${item.key}?`,
+            description: "Apps that read this value will no longer receive it.",
+            confirmLabel: "Delete",
+            destructive: true,
+          })
+          if (!ok) return
           try { await admin(`/config/${item.key}`, { method: "DELETE" }); onChanged() } catch (e) { toast.error(errorMessage(e)) }
         }}
       >

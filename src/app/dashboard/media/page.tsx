@@ -4,6 +4,7 @@ import { useRef, useState } from "react"
 import { Copy, FileText, Trash2, Upload } from "lucide-react"
 import { toast } from "sonner"
 import { PageHeader } from "@/components/dashboard/page-header"
+import { useConfirm } from "@/components/dashboard/confirm"
 import { Button } from "@/components/ui/button"
 import { errorMessage } from "@/lib/api"
 import { useResource, useStore } from "@/lib/store"
@@ -27,6 +28,7 @@ const imageSize = (file: File) =>
 
 export default function MediaPage() {
   const { admin } = useStore()
+  const confirm = useConfirm()
   const { data, loading, error, reload } = useResource<{ data: MediaItem[] }>("/media")
   const input = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
@@ -91,7 +93,13 @@ export default function MediaPage() {
                 <button
                   aria-label="Delete"
                   onClick={async () => {
-                    if (!window.confirm(`Delete ${m.filename}?`)) return
+                    const ok = await confirm({
+                      title: `Delete ${m.filename}?`,
+                      description: "Entries that point to this file will lose it. This can't be undone.",
+                      confirmLabel: "Delete",
+                      destructive: true,
+                    })
+                    if (!ok) return
                     try { await admin(`/media/${m.id}`, { method: "DELETE" }); reload() } catch (e) { toast.error(errorMessage(e)) }
                   }}
                   className="grid size-7 place-items-center rounded-full bg-white/90"

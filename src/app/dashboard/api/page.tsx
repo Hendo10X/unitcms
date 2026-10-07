@@ -10,12 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { CodeBlock } from "@/components/code-block"
 import { Ago } from "@/components/dashboard/ago"
+import { useConfirm } from "@/components/dashboard/confirm"
 import { errorMessage } from "@/lib/api"
 import { useResource, useStore } from "@/lib/store"
 import type { ApiKey } from "@/lib/types"
 
 export default function ApiPage() {
   const { project, env, admin } = useStore()
+  const confirm = useConfirm()
   const { data, loading, error, reload } = useResource<{ data: ApiKey[] }>("/keys")
   const [kind, setKind] = useState<"delivery" | "admin">("delivery")
   const [label, setLabel] = useState("")
@@ -57,7 +59,13 @@ export default function ApiPage() {
               variant="outline"
               className="bg-secondary"
               onClick={async () => {
-                if (!window.confirm("Revoke this key? Apps using it will stop working.")) return
+                const ok = await confirm({
+                  title: `Revoke ${k.label || "this key"}?`,
+                  description: "Apps using it will stop working straight away. This can't be undone.",
+                  confirmLabel: "Revoke key",
+                  destructive: true,
+                })
+                if (!ok) return
                 try { await admin(`/keys/${k.id}`, { method: "DELETE" }); reload() } catch (e) { toast.error(errorMessage(e)) }
               }}
             >

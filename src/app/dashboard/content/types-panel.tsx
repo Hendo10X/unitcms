@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { Panel } from "@/components/dashboard/page-header"
+import { useConfirm } from "@/components/dashboard/confirm"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -32,6 +33,7 @@ type Draft = { existing: boolean; name: string; label: string; fields: Field[] }
 
 export function TypesPanel({ types, onChanged }: { types: ContentType[]; onChanged: () => void }) {
   const { admin } = useStore()
+  const confirm = useConfirm()
   const [draft, setDraft] = useState<Draft | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -59,7 +61,13 @@ export function TypesPanel({ types, onChanged }: { types: ContentType[]; onChang
   }
 
   async function remove(t: ContentType) {
-    if (!window.confirm(`Delete "${t.label}" and every entry of this type, in all environments? This can't be undone.`)) return
+    const ok = await confirm({
+      title: `Delete “${t.label}”?`,
+      description: "Every entry of this type is deleted too, in all environments. This can't be undone.",
+      confirmLabel: "Delete type",
+      destructive: true,
+    })
+    if (!ok) return
     try {
       await admin(`/types/${t.name}`, { method: "DELETE" })
       toast("Type deleted")

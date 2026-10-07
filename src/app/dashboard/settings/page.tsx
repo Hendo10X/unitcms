@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { PageHeader, Panel } from "@/components/dashboard/page-header"
 import { CreateProject } from "@/components/dashboard/create-project"
+import { useConfirm } from "@/components/dashboard/confirm"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,6 +15,7 @@ import { useStore } from "@/lib/store"
 export default function SettingsPage() {
   const { project, user, admin, reloadProjects, env, setEnv } = useStore()
   const router = useRouter()
+  const confirm = useConfirm()
   const [name, setName] = useState<string | null>(null)
   const value = name ?? project?.name ?? ""
 
@@ -86,7 +88,14 @@ export default function SettingsPage() {
         <Button
           variant="destructive"
           onClick={async () => {
-            if (!project || !window.confirm(`Delete "${project.name}" permanently?`)) return
+            if (!project) return
+            const ok = await confirm({
+              title: `Delete “${project.name}”?`,
+              description: "All content, config, flags, media and keys in every environment are deleted permanently.",
+              confirmLabel: "Delete project",
+              destructive: true,
+            })
+            if (!ok) return
             try {
               await api(`/projects/${project.id}`, { method: "DELETE" })
               await reloadProjects()
