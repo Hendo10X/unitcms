@@ -19,9 +19,10 @@ const hex = (r: number) => {
 }
 const pts = (...p: number[][]) => p.map((q) => q.join(",")).join(" ")
 
-export function LogoMark({ size = 40 }: { size?: number }) {
+export function LogoMark({ size = 30 }: { size?: number }) {
   const o = hex(14)
-  const i = hex(6.5)
+  // Larger inner cube. 9.5 still clears the outer cube while it spins.
+  const i = hex(9.5)
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden className="shrink-0 overflow-visible">
       {/* outer cube, dotted */}
@@ -47,7 +48,7 @@ export function LogoMark({ size = 40 }: { size?: number }) {
 
 export function Logo({ href = "/" }: { href?: string }) {
   return (
-    <Link href={href} className="flex items-center gap-2.5 text-[17px] font-medium tracking-[-0.5px]">
+    <Link href={href} className="flex items-center gap-2 text-[17px] font-medium tracking-[-0.5px]">
       <LogoMark />
       UnitCMS
     </Link>
