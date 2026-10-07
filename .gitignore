@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local embedded database
+.data/
+
+# keep the example env file in git
+!.env.example
+
+# local tooling
+.claude/
