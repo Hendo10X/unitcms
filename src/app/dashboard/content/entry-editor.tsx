@@ -182,7 +182,7 @@ function FieldInput({ f, value, media, onChange }: { f: Field; value: unknown; m
         <Textarea
           id={id}
           rows={4}
-          className="font-mono text-[12px]"
+          className="font-mono text-base md:text-[12px]"
           placeholder={f.type === "list" ? "[]" : "{}"}
           value={String(value ?? "")}
           onChange={(e) => onChange(e.target.value)}

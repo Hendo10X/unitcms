@@ -50,20 +50,20 @@ const rows: { label: string; links: { t: string; href: string }[] }[] = [
 
 export function Footer() {
   return (
-    <footer className="dotted-t">
+    <footer className="bg-primary text-white [--dot:rgb(255_255_255/0.35)]">
       <div className="dotted-x mx-auto max-w-[1080px] px-6 pb-16 pt-24">
         <div className="mx-auto max-w-[820px]">
           <h2 className="text-[clamp(30px,4.4vw,52px)]">Start shipping today with UnitCMS</h2>
           <div className="mt-10 flex flex-wrap gap-x-14 gap-y-6">
             <div>
-              <p className="text-[15px] text-muted-foreground">Get started</p>
+              <p className="text-[15px] text-white/70">Get started</p>
               <div className="mt-2 flex gap-5">
                 <FooterBig href="/signup">Create account</FooterBig>
                 <FooterBig href="/login">Sign in</FooterBig>
               </div>
             </div>
             <div>
-              <p className="text-[15px] text-muted-foreground">Build</p>
+              <p className="text-[15px] text-white/70">Build</p>
               <div className="mt-2 flex gap-6">
                 <FooterBig href="/docs/quickstart">Quickstart</FooterBig>
                 <FooterBig href="/docs/sdk-react-native">React Native SDK</FooterBig>
@@ -74,8 +74,8 @@ export function Footer() {
           <div className="mt-16">
             {rows.map((r) => (
               <div key={r.label} className="dotted-t flex items-center justify-between py-4 text-[14px]">
-                <span className="text-[#a3a39d]">{r.label}</span>
-                <div className="flex gap-8">
+                <span className="text-white/60">{r.label}</span>
+                <div className="flex flex-wrap justify-end gap-x-8 gap-y-1">
                   {r.links.map((l) => (
                     <Link key={l.t} href={l.href} className="transition-opacity hover:opacity-60">
                       {l.t}
@@ -86,7 +86,7 @@ export function Footer() {
             ))}
             <div className="dotted-t" />
           </div>
-          <p className="mt-6 text-[13px] text-muted-foreground">© 2026 UnitCMS. Built for apps, not websites.</p>
+          <p className="mt-6 text-[13px] text-white/70">© 2026 UnitCMS. Built for apps, not websites.</p>
         </div>
       </div>
     </footer>
@@ -97,7 +97,7 @@ function FooterBig({ href, children }: { href: string; children: React.ReactNode
   return (
     <Link
       href={href}
-      className="border-b border-foreground text-[20px] font-medium tracking-[-0.6px] transition-opacity hover:opacity-60"
+      className="border-b border-white text-[20px] font-medium tracking-[-0.6px] transition-opacity hover:opacity-60"
     >
       {children}
     </Link>

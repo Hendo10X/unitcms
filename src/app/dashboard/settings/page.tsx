@@ -28,7 +28,7 @@ export default function SettingsPage() {
         </div>
         <div className="space-y-1.5">
           <Label>Project ID</Label>
-          <Input value={project?.id ?? ""} readOnly className="font-mono text-[13px] text-muted-foreground" />
+          <Input value={project?.id ?? ""} readOnly className="font-mono text-base text-muted-foreground md:text-[13px]" />
         </div>
         <Button
           disabled={!value.trim() || value === project?.name}

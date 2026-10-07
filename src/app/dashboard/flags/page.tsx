@@ -64,7 +64,7 @@ export default function FlagsPage() {
         {!loading && flags.length === 0 && <p className="p-10 text-center text-[14px] text-muted-foreground">No flags yet.</p>}
       </Panel>
       <Panel className="mt-3 flex flex-wrap items-center gap-3 p-4">
-        <Input placeholder="new_flag" value={key} onChange={(e) => setKey(e.target.value)} className="max-w-[220px] flex-1 font-mono text-[13px]" />
+        <Input placeholder="new_flag" value={key} onChange={(e) => setKey(e.target.value)} className="max-w-[220px] flex-1 font-mono text-base md:text-[13px]" />
         <Input placeholder="Description (optional)" value={desc} onChange={(e) => setDesc(e.target.value)} onKeyDown={(e) => e.key === "Enter" && add()} className="min-w-[200px] flex-1" />
         <Button onClick={add}><Plus /> Add flag</Button>
       </Panel>

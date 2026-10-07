@@ -54,7 +54,7 @@ function Row({ item, onChanged }: { item: ConfigItem; onChanged: () => void }) {
         {item.type === "boolean" ? (
           <Switch checked={item.value === true} onCheckedChange={(c) => put(c)} />
         ) : (
-          <Input value={text} onChange={(e) => setText(e.target.value)} className="font-mono text-[13px]" />
+          <Input value={text} onChange={(e) => setText(e.target.value)} className="font-mono text-base md:text-[13px]" />
         )}
       </div>
       {item.type !== "boolean" && (
@@ -116,7 +116,7 @@ export default function ConfigPage() {
       </Panel>
 
       <Panel className="mt-3 flex flex-wrap items-center gap-3 p-4">
-        <Input placeholder="new_key" value={key} onChange={(e) => setKey(e.target.value)} onKeyDown={(e) => e.key === "Enter" && add()} className="max-w-[260px] flex-1 font-mono text-[13px]" />
+        <Input placeholder="new_key" value={key} onChange={(e) => setKey(e.target.value)} onKeyDown={(e) => e.key === "Enter" && add()} className="max-w-[260px] flex-1 font-mono text-base md:text-[13px]" />
         <Select value={type} onValueChange={(v) => v && setType(v as ConfigType)}>
           <SelectTrigger className="w-[130px] capitalize"><SelectValue /></SelectTrigger>
           <SelectContent>

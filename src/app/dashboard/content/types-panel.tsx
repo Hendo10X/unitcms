@@ -129,7 +129,7 @@ export function TypesPanel({ types, onChanged }: { types: ContentType[]; onChang
                   <div key={i} className="flex items-center gap-2">
                     <Input
                       aria-label="Field name"
-                      className="min-w-0 flex-1 font-mono text-[13px]"
+                      className="min-w-0 flex-1 font-mono text-base md:text-[13px]"
                       placeholder="field_name"
                       value={f.name}
                       onChange={(e) => setField(i, { name: e.target.value.replace(/[^a-zA-Z0-9_]/g, "") })}
