@@ -54,9 +54,10 @@ export default function Home() {
         <section>
           <div className="dotted-x mx-auto max-w-[1080px] px-6 pb-16 pt-20 text-center">
             <Reveal>
-              <h1 className="text-[clamp(22px,5.5vw,70px)]">
-                <span className="block whitespace-nowrap">Ship app content</span>
-                <span className="block whitespace-nowrap">without shipping an update.</span>
+              {/* Two lines from tablet up; wraps naturally on phones so the text stays a readable size. */}
+              <h1 className="text-[clamp(38px,7vw,70px)]">
+                <span className="block sm:whitespace-nowrap">Ship app content</span>
+                <span className="block sm:whitespace-nowrap">without shipping an update.</span>
               </h1>
               <p className="mx-auto mt-7 max-w-[560px] text-[18px] leading-snug text-muted-foreground">
                 Content, remote config, feature flags and offline caching in one mobile-first system. Built for
@@ -98,15 +99,16 @@ export default function Home() {
           sub="Every response is cached on device and labelled with where it came from."
         >
           <SdkDemo />
-          <div className="mx-auto mt-14 grid max-w-[680px] grid-cols-3 gap-6">
+          {/* Each stat stays on one line, even on a phone. */}
+          <div className="mx-auto mt-14 flex max-w-[680px] justify-between gap-3">
             {[
               ["< 5 min", "to first request"],
               ["0 lines", "of cache code"],
               ["3 sources", "network, cache, offline"],
             ].map(([a, b]) => (
-              <div key={a}>
-                <p className="text-[28px] font-medium tracking-[-1.2px]">{a}</p>
-                <p className="mt-1 text-[13px] text-muted-foreground">{b}</p>
+              <div key={a} className="whitespace-nowrap">
+                <p className="text-[19px] font-medium tracking-[-0.04em] sm:text-[28px]">{a}</p>
+                <p className="mt-1 text-[10.5px] text-muted-foreground sm:text-[13px]">{b}</p>
               </div>
             ))}
           </div>

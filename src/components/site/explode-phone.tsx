@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
 import { motion, type Variants } from "motion/react"
+import { useHoverOrScroll } from "@/hooks/use-hover-or-scroll"
 
 const spring = { type: "spring", stiffness: 140, damping: 18 } as const
 
@@ -25,20 +25,27 @@ function Tag({ children, className }: { children: React.ReactNode; className?: s
 
 const L = "border-[1.2px] border-[color:var(--line)]"
 
+// On phones the layers fan out in a tight zig-zag so everything stays inside the screen.
+const OFFSETS = {
+  wide: { content: [-310, -100, -4], config: [285, -120, 3], flags: [300, 40, -3], cache: [-290, 175, 4] },
+  compact: { content: [50, -25, -3], config: [-50, 25, 3], flags: [50, 55, -2], cache: [-45, -42, 3] },
+} as const
+
 export function ExplodePhone() {
-  const [open, setOpen] = useState(false)
+  const { ref, active: open, bind, toggle, mobile } = useHoverOrScroll()
   const state = open ? "open" : "closed"
+  const o = mobile ? OFFSETS.compact : OFFSETS.wide
 
   return (
     <div
-      className="relative mx-auto h-[560px] w-full max-w-[760px] cursor-pointer select-none"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-      onClick={() => setOpen((o) => !o)}
+      ref={ref}
+      className="relative mx-auto h-[580px] w-full max-w-[760px] cursor-pointer select-none"
+      {...bind}
+      onClick={toggle}
       role="img"
-      aria-label="Wireframe of a mobile app that separates into content, config, flags and cache layers on hover"
+      aria-label="Wireframe of a mobile app that separates into content, config, flags and cache layers"
     >
-      <div className="absolute inset-0 flex scale-[0.62] items-center justify-center sm:scale-100">
+      <div className="absolute inset-0 flex items-center justify-center">
         {/* base screen */}
         <motion.div animate={state} initial="closed" className="relative">
           <div className={`relative h-[500px] w-[250px] rounded-[42px] ${L} bg-[#fafafa]/80`}>
@@ -47,7 +54,7 @@ export function ExplodePhone() {
 
           {/* content layer */}
           <motion.div
-            variants={layer(-310, -100, -4, 0.02)}
+            variants={layer(o.content[0], o.content[1], o.content[2], 0.02)}
             className={`absolute left-5 top-[132px] w-[210px] rounded-2xl ${L} bg-white p-3`}
           >
             <div className={`h-20 rounded-xl ${L} bg-primary/5`} />
@@ -59,7 +66,7 @@ export function ExplodePhone() {
 
           {/* config layer */}
           <motion.div
-            variants={layer(285, -120, 3, 0.06)}
+            variants={layer(o.config[0], o.config[1], o.config[2], 0.06)}
             className={`absolute left-5 top-[300px] w-[210px] space-y-1.5 rounded-2xl ${L} bg-white p-3 font-mono text-[10px] text-primary`}
           >
             <div className="flex justify-between"><span>maintenance_mode</span><span>false</span></div>
@@ -70,7 +77,7 @@ export function ExplodePhone() {
 
           {/* flags layer */}
           <motion.div
-            variants={layer(300, 40, -3, 0.1)}
+            variants={layer(o.flags[0], o.flags[1], o.flags[2], 0.1)}
             className={`absolute left-5 top-[392px] w-[210px] space-y-2 rounded-2xl ${L} bg-white p-3 font-mono text-[10px] text-primary`}
           >
             {[["new_checkout", true], ["map_tracking", false]].map(([k, on]) => (
@@ -86,7 +93,7 @@ export function ExplodePhone() {
 
           {/* cache layer */}
           <motion.div
-            variants={layer(-290, 175, 4, 0.14)}
+            variants={layer(o.cache[0], o.cache[1], o.cache[2], 0.14)}
             className={`absolute left-5 top-[64px] flex w-[210px] items-center gap-3 rounded-2xl ${L} bg-white p-3`}
           >
             <span className="grid size-9 place-items-center rounded-full bg-primary/10">
@@ -100,9 +107,6 @@ export function ExplodePhone() {
           </motion.div>
         </motion.div>
       </div>
-      <p className="eyebrow absolute inset-x-0 bottom-0 text-center">
-        {open ? "Content · Config · Flags · Cache" : "Hover to take it apart"}
-      </p>
     </div>
   )
 }

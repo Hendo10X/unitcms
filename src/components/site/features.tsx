@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { AnimatePresence, animate, motion, type Variants } from "motion/react"
 import { Check, AlertTriangle, Database, Settings2, Flag } from "lucide-react"
 import { Reveal } from "./reveal"
+import { useHoverOrScroll } from "@/hooks/use-hover-or-scroll"
 
 const spring = { type: "spring", stiffness: 160, damping: 20 } as const
 const L = "border-[1.2px] border-[color:var(--line)]"
@@ -20,9 +21,19 @@ function Hex({ className }: { className?: string }) {
   )
 }
 
+/** Plays its "hover" variants on hover (desktop) or when scrolled into view (phones). */
+function HoverArt({ className, children }: { className?: string; children: React.ReactNode }) {
+  const { ref, active, bind } = useHoverOrScroll()
+  return (
+    <motion.div ref={ref} {...bind} initial="rest" animate={active ? "hover" : "rest"} className={className}>
+      {children}
+    </motion.div>
+  )
+}
+
 function ReadingArt() {
   return (
-    <motion.div initial="rest" whileHover="hover" className="relative h-full w-full">
+    <HoverArt className="relative h-full w-full">
       <div className={`absolute left-1/2 top-8 h-[300px] w-[190px] -translate-x-1/2 rounded-[30px] ${L} bg-white`}>
         <div className="mx-auto mt-3 h-4 w-14 rounded-full bg-primary/10" />
         <div className="mx-4 mt-5 space-y-2">
@@ -60,13 +71,13 @@ function ReadingArt() {
           </motion.span>
         </span>
       </motion.div>
-    </motion.div>
+    </HoverArt>
   )
 }
 
 function CacheArt() {
   return (
-    <motion.div initial="rest" whileHover="hover" className="relative h-full w-full">
+    <HoverArt className="relative h-full w-full">
       <div className={`absolute left-1/2 top-8 h-[300px] w-[210px] -translate-x-1/2 rounded-[36px] ${L}`}>
         <div className={`mx-auto mt-3 h-5 w-20 rounded-full ${L}`} />
       </div>
@@ -90,13 +101,13 @@ function CacheArt() {
           </motion.span>
         </span>
       </div>
-    </motion.div>
+    </HoverArt>
   )
 }
 
 function LogArt() {
   return (
-    <motion.div initial="rest" whileHover="hover" className="relative h-full w-full px-6 pt-8">
+    <HoverArt className="relative h-full w-full px-6 pt-8">
       <div className={`rounded-2xl ${L} p-1.5 font-mono text-[11px] uppercase text-primary`}>
         <div className="flex items-center gap-2 rounded-xl px-3 py-2.5">
           <Check className="size-3.5" /> Fetch articles
@@ -117,7 +128,7 @@ function LogArt() {
           </div>
         </motion.div>
       </div>
-    </motion.div>
+    </HoverArt>
   )
 }
 
@@ -230,7 +241,7 @@ function ContentPhone() {
 
 function ConfigPhone() {
   // Interaction 2: the value is edited remotely. The number counts up, the sync bar fills and the type tile lights up.
-  const [on, setOn] = useState(false)
+  const { ref, active: on, bind } = useHoverOrScroll()
   const [value, setValue] = useState(1500)
 
   useEffect(() => {
@@ -244,7 +255,7 @@ function ConfigPhone() {
   }, [on])
 
   return (
-    <div onMouseEnter={() => setOn(true)} onMouseLeave={() => setOn(false)}>
+    <div ref={ref} {...bind}>
       <Phone>
         {[
           <p key="a" className="text-center text-[11px]">delivery_fee</p>,
@@ -290,7 +301,7 @@ function ConfigPhone() {
 
 function FlagsPhone() {
   // Interaction 3: flags flip. The headline rolls ON to OFF and every switch slides across.
-  const [flipped, setFlipped] = useState(false)
+  const { ref, active: flipped, bind } = useHoverOrScroll()
   const rows = [
     { k: "new_home", on: true },
     { k: "new_profile", on: false },
@@ -299,7 +310,7 @@ function FlagsPhone() {
   const colors = ["#ff6b6b", "#ffb454", "#ffd84a", "#3dd68c", "#3dd68c"]
 
   return (
-    <div onMouseEnter={() => setFlipped(true)} onMouseLeave={() => setFlipped(false)}>
+    <div ref={ref} {...bind}>
       <Phone>
         {[
           <p key="a" className="text-center text-[11px]">new_checkout</p>,
@@ -366,12 +377,12 @@ export function Trio() {
     <div className="grid gap-x-6 gap-y-20 md:grid-cols-3">
       {trio.map((t, i) => (
         <Reveal key={t.title} delay={i * 0.08}>
-          <motion.div initial="rest" whileHover="hover" className="text-center">
+          <HoverArt className="text-center">
             <t.icon className="mx-auto size-5 text-muted-foreground" strokeWidth={1.6} />
             <h3 className="mt-4 text-[22px] font-medium tracking-[-0.8px]">{t.title}</h3>
             <p className="mx-auto mt-2 max-w-[280px] text-[15px] leading-snug text-muted-foreground">{t.desc}</p>
             {t.phone}
-          </motion.div>
+          </HoverArt>
         </Reveal>
       ))}
     </div>
