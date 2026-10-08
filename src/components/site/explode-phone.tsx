@@ -32,16 +32,15 @@ const OFFSETS = {
 } as const
 
 export function ExplodePhone() {
-  const { ref, active: open, bind, toggle, mobile } = useHoverOrScroll()
+  // The hero phone opens when it scrolls into view on every device, no hover needed.
+  const { ref, active: open, mobile } = useHoverOrScroll(0.4, true)
   const state = open ? "open" : "closed"
   const o = mobile ? OFFSETS.compact : OFFSETS.wide
 
   return (
     <div
       ref={ref}
-      className="relative mx-auto h-[580px] w-full max-w-[760px] cursor-pointer select-none"
-      {...bind}
-      onClick={toggle}
+      className="relative mx-auto h-[580px] w-full max-w-[760px] select-none"
       role="img"
       aria-label="Wireframe of a mobile app that separates into content, config, flags and cache layers"
     >

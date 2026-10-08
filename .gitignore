@@ -48,3 +48,7 @@ next-env.d.ts
 
 # local tooling
 .claude/
+
+# video project
+video/node_modules/
+video/out/
